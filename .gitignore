@@ -1,0 +1,5 @@
+# Compiled files
+*.exe
+*.n
+*.zip
+test/bin/

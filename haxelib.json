@@ -1,0 +1,14 @@
+{
+	"name": "p2p",
+	"url": "https://github.com/peteshand/p2p",
+	"license": "MIT",
+	"tags": ["p2p", "peer to peer"],
+	"description": "library for p2p communication",
+	"version": "0.0.1",
+	"releasenote": "initial commit, lib currently very limited",
+	"contributors": [ "p.j.shand" ],
+	"classPath": "src/",
+	"dependencies": {
+		
+	}
+}
