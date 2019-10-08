@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"tags": ["p2p", "peer to peer"],
 	"description": "library for p2p communication",
-	"version": "0.0.1",
-	"releasenote": "initial commit, lib currently very limited",
+	"version": "0.1.2",
+	"releasenote": "Add batching",
 	"contributors": [ "p.j.shand" ],
 	"classPath": "src/",
 	"dependencies": {
