@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"tags": ["p2p", "peer to peer"],
 	"description": "library for p2p communication",
-	"version": "0.1.2",
-	"releasenote": "Add batching",
+	"version": "0.1.3",
+	"releasenote": "add error checking to IPCConnection",
 	"contributors": [ "p.j.shand" ],
 	"classPath": "src/",
 	"dependencies": {

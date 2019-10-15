@@ -79,6 +79,13 @@ class IPCConnection implements IConnection {
 	}
 
 	function checkCallbacks(event:Dynamic, batch:CommsBatch) {
+		if (batch == null)
+			return;
+		if (batch.messages == null)
+			return;
+		if (batch.messages.length == 0)
+			return;
+
 		if (batch.senderId == Comms.instanceId) {
 			// from self
 			return;
