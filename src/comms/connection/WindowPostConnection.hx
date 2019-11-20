@@ -5,8 +5,14 @@ import js.Browser;
 import haxe.Json;
 import js.html.Window;
 import comms.*;
+import signals.Signal1;
 
+@:access(comms.Comms)
 class WindowPostConnection implements IConnection {
+	public var connectionIndex:Int;
+	public var comms:Comms;
+	public var onBatch = new Signal1<CommsBatch>();
+
 	static var otherWindows:Array<Window> = [];
 
 	public static function addWindow(window:Window) {
@@ -32,11 +38,12 @@ class WindowPostConnection implements IConnection {
 	}
 
 	public function new() {
+		// connectionIndex = Comms.CONNECTION_COUNT++;
 		addWindow(Browser.window.parent);
 		addWindow(Browser.window.opener);
 	}
 
-	public function send(batch:CommsBatch):Void {
+	public function send(batch:String):Void {
 		if (otherWindows.length == 0) {
 			trace("No other windows open");
 			return;
@@ -46,13 +53,15 @@ class WindowPostConnection implements IConnection {
 		}
 	}
 
-	public function on(id:String, callback:(payload:Dynamic) -> Void):Void {
+	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {
 		Browser.window.addEventListener('message', (event) -> {
-			var batch:CommsBatch = event.data;
+			var batch:CommsBatch = Json.parse(event.data);
+			onBatch.dispatch(batch);
 			for (message in batch.messages) {
+				var payload:CommsPayload = Json.parse(message.payload);
 				if (message.id == id || id == "*") {
 					// if (returnParsedPayload)
-					callback(Json.parse(message.payload));
+					callback(payload.value, connectionIndex);
 					// else
 					// callback(message);
 				}

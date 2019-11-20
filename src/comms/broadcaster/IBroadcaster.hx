@@ -1,6 +1,7 @@
 package comms.broadcaster;
 
-interface IBroadcaster
-{
-    function setCurrentValue():Void;
+interface IBroadcaster {
+	var id:String;
+	var value(get, null):Dynamic;
+	function setCurrentValue():Void;
 }

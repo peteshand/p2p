@@ -1,14 +1,11 @@
 package comms;
 
-typedef CommsMessage = {
-	// senderId:Float,
-	id:String,
-	payload:String,
-	// ?remoteHost:String,
-	// ?remotePort:Int
+typedef CommsBatch = {
+	senderIds:Array<Float>,
+	messages:Array<CommsMessage>
 }
 
-typedef CommsBatch = {
-	senderId:Float,
-	messages:Array<CommsMessage>
+typedef CommsMessage = {
+	id:String,
+	payload:Dynamic
 }

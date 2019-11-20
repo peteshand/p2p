@@ -1,5 +1,6 @@
 package comms.connection;
 
+import haxe.Json;
 import comms.CommsMessage.CommsBatch;
 import electron.Process;
 import electron.main.App;
@@ -8,12 +9,18 @@ import electron.renderer.IpcRenderer;
 import electron.main.IpcMain;
 import comms.Comms;
 import comms.connection.*;
+import signals.Signal1;
 
 @:access(comms.Comms)
 class IPCConnection implements IConnection {
+	public var connectionIndex:Int;
+	public var comms:Comms;
+
 	static var browserWindows:Array<BrowserWindow> = [];
 	static var webviews:Array<Webview> = [];
 	static var isRenderer:Null<Bool> = null;
+
+	public var onBatch = new Signal1<CommsBatch>();
 
 	static function init() {
 		isRenderer = (App == null);
@@ -70,15 +77,24 @@ class IPCConnection implements IConnection {
 	var listeners:Array<CallbackWrapper> = [];
 
 	public function new() {
+		// connectionIndex = Comms.CONNECTION_COUNT++;
 		IPCConnection.init();
 		if (isRenderer) {
 			IpcRenderer.on("ipc", checkCallbacks);
 		} else {
 			IpcMain.on("ipc", checkCallbacks);
 		}
+		onBatch.add(onBatchReceived);
 	}
 
-	function checkCallbacks(event:Dynamic, batch:CommsBatch) {
+	function checkCallbacks(event:Dynamic, batchStr:String) {
+		var batch:CommsBatch = null;
+		try {
+			batch = Json.parse(batchStr);
+		} catch (e:Dynamic) {
+			trace(e);
+			return;
+		}
 		if (batch == null)
 			return;
 		if (batch.messages == null)
@@ -86,20 +102,34 @@ class IPCConnection implements IConnection {
 		if (batch.messages.length == 0)
 			return;
 
-		if (batch.senderId == Comms.instanceId) {
+		if (batch.senderIds != null && batch.senderIds.indexOf(comms.instanceId) != -1) {
 			// from self
 			return;
 		}
+		onBatch.dispatch(batch);
+	}
+
+	function onBatchReceived(batch:CommsBatch) {
 		for (message in batch.messages) {
+			if (message.id == "")
+				continue;
+			var payload:CommsPayload = null;
+			try {
+				payload = Json.parse(message.payload);
+			} catch (e:Dynamic) {
+				trace("Payload Parsing Error: " + e);
+				continue;
+			}
 			for (listener in listeners) {
 				if (listener.id == message.id) {
-					listener.callback(message.payload);
+					// listener.callback(message.payload, connectionIndex);
+					listener.callback(payload.value, connectionIndex);
 				}
 			}
 		}
 	}
 
-	public function send(batch:CommsBatch):Void {
+	public function send(batch:String):Void {
 		if (isRenderer) {
 			IpcRenderer.send("ipc", batch);
 			for (webview in webviews) {
@@ -114,7 +144,7 @@ class IPCConnection implements IConnection {
 		}
 	}
 
-	public function on(id:String, callback:(payload:Dynamic) -> Void):Void {
+	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {
 		listeners.push({id: id, callback: callback});
 	}
 
@@ -134,5 +164,5 @@ typedef Webview = {
 
 typedef CallbackWrapper = {
 	id:String,
-	callback:(payload:Dynamic) -> Void
+	callback:(payload:Dynamic, connectionIndex:Int) -> Void
 }

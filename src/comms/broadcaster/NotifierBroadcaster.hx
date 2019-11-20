@@ -5,9 +5,13 @@ import notifier.Notifier;
 @:access(comms.Comms)
 class NotifierBroadcaster<T> implements IBroadcaster {
 	var notifier:Notifier<T>;
-	var id:String;
+	var comms:Comms;
 
-	public function new(notifier:Notifier<T>, id:String) {
+	public var id:String;
+	public var value(get, null):Dynamic;
+
+	public function new(comms:Comms, notifier:Notifier<T>, id:String) {
+		this.comms = comms;
 		this.id = id;
 		this.notifier = notifier;
 
@@ -15,9 +19,12 @@ class NotifierBroadcaster<T> implements IBroadcaster {
 	}
 
 	public function setCurrentValue():Void {
-		Comms.send(id, notifier.value);
-		// for (connection in Comms.connections) {
-		//	connection.send(id, notifier.value);
+		// if (!comms.PAUSE_BROADCAST) {
+		comms.send(id, notifier.value);
 		// }
+	}
+
+	function get_value():Dynamic {
+		return notifier.value;
 	}
 }

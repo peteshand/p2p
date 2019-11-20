@@ -5,9 +5,13 @@ import notifier.MapNotifier3;
 @:access(comms.Comms)
 class MapBroadcaster<T> implements IBroadcaster {
 	var map:MapNotifier3<String, T>;
-	var id:String;
+	var comms:Comms;
 
-	public function new(map:MapNotifier3<String, T>, id:String) {
+	public var id:String;
+	public var value(get, null):Dynamic;
+
+	public function new(comms:Comms, map:MapNotifier3<String, T>, id:String) {
+		this.comms = comms;
 		this.id = id;
 		this.map = map;
 
@@ -29,8 +33,10 @@ class MapBroadcaster<T> implements IBroadcaster {
 	}
 
 	function send(commsKey:String, key:String, value:T) {
-		Comms.send(commsKey, {key: key, value: value});
-		// for (connection in Comms.connections) {
+		// if (!comms.PAUSE_BROADCAST) {
+		comms.send(commsKey, {key: key, value: value});
+		// }
+		// for (connection in comms.connections) {
 		//	connection.send(commsKey, {key: key, value: value});
 		// }
 	}
@@ -39,5 +45,9 @@ class MapBroadcaster<T> implements IBroadcaster {
 		for (item in map.keyValueIterator()) {
 			send(id + ",add", item.key, item.value);
 		}
+	}
+
+	function get_value():Dynamic {
+		return map.value;
 	}
 }
