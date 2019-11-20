@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"tags": ["p2p", "peer to peer"],
 	"description": "library for p2p communication",
-	"version": "0.1.23",
-	"releasenote": "add non static Comms api to allow for comms group instancing",
+	"version": "0.1.24",
+	"releasenote": "Add K to MapBroadcaster / MapSubscriber",
 	"contributors": [ "p.j.shand" ],
 	"classPath": "src/",
 	"dependencies": {

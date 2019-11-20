@@ -128,19 +128,19 @@ class Comms {
 		EnterFrame.add(tick);
 	}
 
-	public function addBroadcast<T>(id:String, ?map:MapNotifier3<String, T>, ?notifier:Notifier<T>):Void {
+	public function addBroadcast<K, T>(id:String, ?map:MapNotifier3<K, T>, ?notifier:Notifier<T>):Void {
 		trace("addBroadcast: " + id);
 		if (notifier != null)
 			broadcasters.set(id, new NotifierBroadcaster<T>(this, notifier, id));
 		if (map != null)
-			broadcasters.set(id, new MapBroadcaster<T>(this, map, id));
+			broadcasters.set(id, new MapBroadcaster<K, T>(this, map, id));
 	}
 
-	public function addSubscriber<T>(id:String, ?map:MapNotifier3<String, T>, ?notifier:Notifier<T>):Void {
+	public function addSubscriber<K, T>(id:String, ?map:MapNotifier3<K, T>, ?notifier:Notifier<T>):Void {
 		if (notifier != null)
 			subscribers.set(id, new NotifierSubscriber<T>(this, notifier, id));
 		if (map != null)
-			subscribers.set(id, new MapSubscriber<T>(this, map, id));
+			subscribers.set(id, new MapSubscriber<K, T>(this, map, id));
 	}
 
 	// public function removeBroadcast(notifier:Notifier<Dynamic>, id:String):Void {}

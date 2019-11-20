@@ -3,14 +3,14 @@ package comms.broadcaster;
 import notifier.MapNotifier3;
 
 @:access(comms.Comms)
-class MapBroadcaster<T> implements IBroadcaster {
-	var map:MapNotifier3<String, T>;
+class MapBroadcaster<K, T> implements IBroadcaster {
+	var map:MapNotifier3<K, T>;
 	var comms:Comms;
 
 	public var id:String;
 	public var value(get, null):Dynamic;
 
-	public function new(comms:Comms, map:MapNotifier3<String, T>, id:String) {
+	public function new(comms:Comms, map:MapNotifier3<K, T>, id:String) {
 		this.comms = comms;
 		this.id = id;
 		this.map = map;
@@ -20,19 +20,19 @@ class MapBroadcaster<T> implements IBroadcaster {
 		map.onRemove.add(onRemove);
 	}
 
-	function onAdd(key:String, value:T) {
+	function onAdd(key:K, value:T) {
 		send(id + ",add", key, value);
 	}
 
-	function onChange(key:String, value:T) {
+	function onChange(key:K, value:T) {
 		send(id + ",add", key, value);
 	}
 
-	function onRemove(key:String) {
+	function onRemove(key:K) {
 		send(id + ",remove", key, null);
 	}
 
-	function send(commsKey:String, key:String, value:T) {
+	function send(commsKey:String, key:K, value:T) {
 		// if (!comms.PAUSE_BROADCAST) {
 		comms.send(commsKey, {key: key, value: value});
 		// }
@@ -47,7 +47,7 @@ class MapBroadcaster<T> implements IBroadcaster {
 		}
 	}
 
-	function get_value():Dynamic {
+	function get_value():Map<K, T> {
 		return map.value;
 	}
 }
