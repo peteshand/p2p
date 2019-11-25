@@ -1,16 +1,16 @@
 package comms.broadcaster;
 
-import notifier.MapNotifier3;
+import notifier.MapNotifier;
 
 @:access(comms.Comms)
 class MapBroadcaster<K, T> implements IBroadcaster {
-	var map:MapNotifier3<K, T>;
+	var map:MapNotifier<K, T>;
 	var comms:Comms;
 
 	public var id:String;
 	public var value(get, null):Dynamic;
 
-	public function new(comms:Comms, map:MapNotifier3<K, T>, id:String) {
+	public function new(comms:Comms, map:MapNotifier<K, T>, id:String) {
 		this.comms = comms;
 		this.id = id;
 		this.map = map;

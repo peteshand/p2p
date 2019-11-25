@@ -1,10 +1,13 @@
 package comms.connection;
 
-import comms.CommsMessage.CommsBatch;
+#if html5
 import js.Browser;
-import haxe.Json;
 import js.html.Window;
+
+import comms.CommsMessage.CommsBatch;
+
 import comms.*;
+import haxe.Json;
 import signals.Signal1;
 
 @:access(comms.Comms)
@@ -73,3 +76,4 @@ class WindowPostConnection implements IConnection {
 		// need to implement
 	}
 }
+#end

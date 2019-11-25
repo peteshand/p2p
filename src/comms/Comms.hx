@@ -8,7 +8,7 @@ import comms.broadcaster.*;
 import comms.subscriber.*;
 import comms.connection.IConnection;
 import notifier.Notifier;
-import notifier.MapNotifier3;
+import notifier.MapNotifier;
 import comms.notifier.*;
 import haxe.Json;
 import time.EnterFrame;
@@ -28,12 +28,12 @@ class Comms {
 		staticInstance.install(connection);
 	}
 
-	public static function addBroadcast_<T>(id:String, ?map:MapNotifier3<String, T>, ?notifier:Notifier<T>):Void {
+	public static function addBroadcast_<T>(id:String, ?map:MapNotifier<String, T>, ?notifier:Notifier<T>):Void {
 		Comms.init();
 		staticInstance.addBroadcast(id, map, notifier);
 	}
 
-	public static function addSubscriber_<T>(id:String, ?map:MapNotifier3<String, T>, ?notifier:Notifier<T>):Void {
+	public static function addSubscriber_<T>(id:String, ?map:MapNotifier<String, T>, ?notifier:Notifier<T>):Void {
 		Comms.init();
 		staticInstance.addSubscriber(id, map, notifier);
 	}
@@ -113,6 +113,7 @@ class Comms {
 	}
 
 	function onPeerConect() {
+		trace("Send All");
 		for (broadcaster in broadcasters) {
 			#if (debugComms && html5)
 			trace("peer connect, send: " + broadcaster.id + " - " + broadcaster.value);
@@ -127,14 +128,15 @@ class Comms {
 		EnterFrame.add(tick);
 	}
 
-	public function addBroadcast<K, T>(id:String, ?map:MapNotifier3<K, T>, ?notifier:Notifier<T>):Void {
+	public function addBroadcast<K, T>(id:String, ?map:MapNotifier<K, T>, ?notifier:Notifier<T>):Void {
+		trace("addBroadcast: " + id);
 		if (notifier != null)
 			broadcasters.set(id, new NotifierBroadcaster<T>(this, notifier, id));
 		if (map != null)
 			broadcasters.set(id, new MapBroadcaster<K, T>(this, map, id));
 	}
 
-	public function addSubscriber<K, T>(id:String, ?map:MapNotifier3<K, T>, ?notifier:Notifier<T>):Void {
+	public function addSubscriber<K, T>(id:String, ?map:MapNotifier<K, T>, ?notifier:Notifier<T>):Void {
 		if (notifier != null)
 			subscribers.set(id, new NotifierSubscriber<T>(this, notifier, id));
 		if (map != null)

@@ -1,12 +1,13 @@
 package comms.connection;
 
-import haxe.Json;
-import comms.CommsMessage.CommsBatch;
+#if electron
 import electron.Process;
 import electron.main.App;
 import electron.main.BrowserWindow;
 import electron.renderer.IpcRenderer;
 import electron.main.IpcMain;
+import haxe.Json;
+import comms.CommsMessage.CommsBatch;
 import comms.Comms;
 import comms.connection.*;
 import signals.Signal1;
@@ -166,3 +167,4 @@ typedef CallbackWrapper = {
 	id:String,
 	callback:(payload:Dynamic, connectionIndex:Int) -> Void
 }
+#end

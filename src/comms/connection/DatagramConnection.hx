@@ -1,17 +1,22 @@
 package comms.connection;
 
-import comms.MulticastAddr;
+#if nodejs
 import js.node.Dgram;
-import comms.CommsMessage.CommsBatch;
-import comms.connection.IConnection;
-import comms.CommsMessage;
-import comms.CommsPayload;
 import js.node.dgram.Socket;
 import js.node.buffer.Buffer;
+#end
+
 import haxe.Json;
 import haxe.Serializer;
 import signals.Signal1;
 
+import comms.MulticastAddr;
+import comms.CommsMessage.CommsBatch;
+import comms.connection.IConnection;
+import comms.CommsMessage;
+import comms.CommsPayload;
+
+#if nodejs
 @:access(comms.Comms)
 class DatagramConnection implements IConnection {
 	public var connectionIndex:Int;
@@ -126,3 +131,25 @@ class DatagramConnection implements IConnection {
 		// need to implement
 	}
 }
+#else
+class DatagramConnection implements IConnection {
+	public var onBatch:Signal1<CommsBatch>;
+	public var connectionIndex:Int;
+	public var comms:Comms;
+	
+	public function new(port:Int = 33333, ?multicastAddr:MulticastAddr, callback:(bindsuccessful:Bool) -> Void = null) {
+		throw "need to implement without nodejs";
+	}
+
+	public function send(batch:String):Void
+	{
+		throw "need to implement without nodejs";
+	}
+	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {
+		throw "need to implement without nodejs";
+	}
+	public function close():Void{
+		throw "need to implement without nodejs";
+	}
+}
+#end

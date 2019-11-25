@@ -4,11 +4,16 @@
 	"license": "MIT",
 	"tags": ["p2p", "peer to peer"],
 	"description": "library for p2p communication",
-	"version": "0.1.24",
-	"releasenote": "Add K to MapBroadcaster / MapSubscriber",
+	"version": "0.1.25",
+	"releasenote": "notifier lib compatibility",
 	"contributors": [ "p.j.shand" ],
 	"classPath": "src/",
 	"dependencies": {
+		"notifier": "",
+		"delay": "",
+		"keyboard": "",
+		"time": "",
+		"signals": "",
 		
 	}
 }

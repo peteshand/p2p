@@ -1,15 +1,15 @@
 package comms.subscriber;
 
-import notifier.MapNotifier3;
+import notifier.MapNotifier;
 import comms.connection.IConnection;
 
 @:access(comms.Comms)
 class MapSubscriber<K, T> implements ISubscriber {
-	var map:MapNotifier3<K, T>;
+	var map:MapNotifier<K, T>;
 	var id:String;
 	var comms:Comms;
 
-	public function new(comms:Comms, map:MapNotifier3<K, T>, id:String) {
+	public function new(comms:Comms, map:MapNotifier<K, T>, id:String) {
 		this.comms = comms;
 		this.map = map;
 		this.id = id;
