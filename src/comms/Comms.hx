@@ -113,11 +113,7 @@ class Comms {
 	}
 
 	function onPeerConect() {
-		trace("Send All");
 		for (broadcaster in broadcasters) {
-			#if (debugComms && html5)
-			trace("peer connect, send: " + broadcaster.id + " - " + broadcaster.value);
-			#end
 			broadcaster.setCurrentValue();
 		}
 	}
@@ -129,7 +125,6 @@ class Comms {
 	}
 
 	public function addBroadcast<K, T>(id:String, ?map:MapNotifier<K, T>, ?notifier:Notifier<T>):Void {
-		trace("addBroadcast: " + id);
 		if (notifier != null)
 			broadcasters.set(id, new NotifierBroadcaster<T>(this, notifier, id));
 		if (map != null)
