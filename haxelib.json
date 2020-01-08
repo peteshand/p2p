@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"tags": ["p2p", "peer to peer"],
 	"description": "library for p2p communication",
-	"version": "0.1.25",
-	"releasenote": "notifier lib compatibility",
+	"version": "0.1.26",
+	"releasenote": "add overrideById prop to allow maps to transfer all data over a single id",
 	"contributors": [ "p.j.shand" ],
 	"classPath": "src/",
 	"dependencies": {

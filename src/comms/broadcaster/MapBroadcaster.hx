@@ -34,7 +34,7 @@ class MapBroadcaster<K, T> implements IBroadcaster {
 
 	function send(commsKey:String, key:K, value:T) {
 		// if (!comms.PAUSE_BROADCAST) {
-		comms.send(commsKey, {key: key, value: value});
+		comms.send(commsKey, {key: key, value: value}, false);
 		// }
 		// for (connection in comms.connections) {
 		//	connection.send(commsKey, {key: key, value: value});

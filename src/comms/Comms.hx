@@ -141,7 +141,7 @@ class Comms {
 	// public function removeBroadcast(notifier:Notifier<Dynamic>, id:String):Void {}
 	// public function removeSubscriber(notifier:Notifier<Dynamic>, id:String):Void {}
 
-	public function send(id:String, payload:Dynamic = ""):Void {
+	public function send(id:String, payload:Dynamic = "", overrideById:Bool = true):Void {
 		var message:CommsMessage = {
 			id: id,
 			payload: Json.stringify({value: payload})
@@ -154,10 +154,12 @@ class Comms {
 		#if (debugComms && html5)
 		sent_messages.set(id, message.payload);
 		#end
-		for (i in 0...messages.length) {
-			if (messages[i].id == id) {
-				messages[i].payload = Json.stringify({value: payload});
-				return;
+		if (overrideById) {
+			for (i in 0...messages.length) {
+				if (messages[i].id == id) {
+					messages[i].payload = Json.stringify({value: payload});
+					return;
+				}
 			}
 		}
 		messages.push(message);
