@@ -10,6 +10,8 @@ class MapBroadcaster<K, T> implements IBroadcaster {
 	public var id:String;
 	public var value(get, null):Dynamic;
 
+	var guards:Array<(id:String, value:Dynamic) -> Bool> = [];
+
 	public function new(comms:Comms, map:MapNotifier<K, T>, id:String) {
 		this.comms = comms;
 		this.id = id;
@@ -33,8 +35,13 @@ class MapBroadcaster<K, T> implements IBroadcaster {
 	}
 
 	function send(commsKey:String, key:K, value:T) {
+		var payload:{key:K, value:T} = {key: key, value: value};
+		for (guard in guards) {
+			if (!guard(commsKey, untyped payload))
+				return;
+		}
 		// if (!comms.PAUSE_BROADCAST) {
-		comms.send(commsKey, {key: key, value: value}, false);
+		comms.send(commsKey, payload, false);
 		// }
 		// for (connection in comms.connections) {
 		//	connection.send(commsKey, {key: key, value: value});
@@ -45,6 +52,10 @@ class MapBroadcaster<K, T> implements IBroadcaster {
 		for (item in map.keyValueIterator()) {
 			send(id + ",add", item.key, item.value);
 		}
+	}
+
+	public function addGuard(guard:(id:Dynamic, value:Dynamic) -> Bool):Void {
+		guards.push(untyped guard);
 	}
 
 	function get_value():Map<K, T> {
