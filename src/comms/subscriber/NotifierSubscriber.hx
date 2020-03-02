@@ -26,7 +26,7 @@ class NotifierSubscriber<T> implements ISubscriber {
 	function onMessage(payload:T, connectionIndex:Int) {
 		// comms.PAUSE_BROADCAST = true;
 		#if (debugComms && html5)
-		comms.received_messages.set(id, payload);
+		Comms.received_messages.set(id, payload);
 		#end
 		notifier.value = payload;
 		// comms.PAUSE_BROADCAST = false;

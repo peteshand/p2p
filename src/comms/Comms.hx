@@ -68,12 +68,23 @@ class Comms {
 
 	// @:isVar public var selfListen(default, set):Bool = false;
 	var batchSize:Int = 0;
-	var sent_messages = new Map<String, String>();
-	var received_messages = new Map<String, Dynamic>();
+
+	static var sent_messages:Map<String, String>;
+	static var received_messages:Map<String, Dynamic>;
 
 	var relayer:Relayer;
 
 	public function new() {
+		if (sent_messages == null) {
+			sent_messages = new Map<String, String>();
+			received_messages = new Map<String, String>();
+
+			#if (debugComms && html5)
+			Reflect.setProperty(js.Browser.window, 'sent_messages', sent_messages);
+			Reflect.setProperty(js.Browser.window, 'received_messages', received_messages);
+			#end
+		}
+
 		relayer = new Relayer(this);
 	}
 
@@ -88,11 +99,6 @@ class Comms {
 		for (subscriber in subscribers) {
 			subscriber.addConnection(connection);
 		}
-
-		#if (debugComms && html5)
-		Reflect.setProperty(js.Browser.window, 'sent_messages', sent_messages);
-		Reflect.setProperty(js.Browser.window, 'received_messages', received_messages);
-		#end
 
 		/*if (!listeningToConnect) {
 			listeningToConnect = true;
@@ -119,7 +125,9 @@ class Comms {
 	}
 
 	function sendConnectMessage() {
+		trace("sendConnectMessage");
 		send("connect", 0);
+		onPeerConect();
 		EnterFrame.remove(tick);
 		EnterFrame.add(tick);
 	}
@@ -176,6 +184,7 @@ class Comms {
 	public function on(id:String, callback:(payload:Dynamic) -> Void):Void {
 		for (connection in connections) {
 			connection.on(id, (payload, connectionIndex) -> {
+				trace([id, payload]);
 				#if (debugComms && html5)
 				received_messages.set(id, payload);
 				#end

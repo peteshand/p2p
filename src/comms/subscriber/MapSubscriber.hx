@@ -26,14 +26,14 @@ class MapSubscriber<K, T> implements ISubscriber {
 
 	function onAdd(payload:{key:K, value:T}, connectionIndex:Int) {
 		// comms.PAUSE_BROADCAST = true;
-		comms.received_messages.set(id + ",add", payload);
+		Comms.received_messages.set(id + ",add", payload);
 		map.set(payload.key, payload.value);
 		// comms.PAUSE_BROADCAST = false;
 	}
 
 	function onRemove(payload:{key:K}, connectionIndex:Int) {
 		// comms.PAUSE_BROADCAST = true;
-		comms.received_messages.set(id + ",remove", "");
+		Comms.received_messages.set(id + ",remove", "");
 		map.removeItem(payload.key);
 		// comms.PAUSE_BROADCAST = false;
 	}
