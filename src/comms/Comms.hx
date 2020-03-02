@@ -1,5 +1,6 @@
 package comms;
 
+import js.Browser;
 import keyboard.Key;
 import keyboard.Keyboard;
 import comms.CommsMessage.CommsBatch;
@@ -163,8 +164,10 @@ class Comms {
 			payload: Json.stringify({value: payload})
 		}
 		var size:Int = Math.round(message.id.length + message.payload.length + 10);
-		batchSize += size;
-		if (batchSize > 500) {
+		batchSize = pack().length;
+		// trace("batchSize = " + batchSize);
+		if (batchSize > 1000) {
+			// trace([size, batchSize]);
 			sendBatch();
 		}
 		#if (debugComms && html5)
@@ -174,6 +177,7 @@ class Comms {
 			for (i in 0...messages.length) {
 				if (messages[i].id == id) {
 					messages[i].payload = Json.stringify({value: payload});
+					batchSize = pack().length;
 					return;
 				}
 			}
@@ -184,7 +188,7 @@ class Comms {
 	public function on(id:String, callback:(payload:Dynamic) -> Void):Void {
 		for (connection in connections) {
 			connection.on(id, (payload, connectionIndex) -> {
-				trace([id, payload]);
+				// trace([id, payload]);
 				#if (debugComms && html5)
 				received_messages.set(id, payload);
 				#end
@@ -207,25 +211,23 @@ class Comms {
 		if (messages.length == 0) {
 			return;
 		}
-		var batchStr:String = Json.stringify({
-			senderIds: [instanceId],
-			messages: messages
-		});
+		var batchStr:String = pack();
+		// trace(batchStr.length);
 
-		var serializedStr:String = Serializer.run({
-			senderIds: [instanceId],
-			messages: messages
-		});
-		// trace("batchStr.length = " + batchStr.length);
-		// trace("serializedStr.length = " + serializedStr.length);
-
-		// trace(batchStr);
-		// trace(serializedStr);
-
+		for (connection in connections) {
+			if (!connection.send(batchStr)) {
+				Browser.console.log(messages);
+				trace("Error sending");
+			}
+		}
 		messages = [];
 		batchSize = 0;
-		for (connection in connections) {
-			connection.send(batchStr);
-		}
+	}
+
+	function pack():String {
+		return Json.stringify({
+			senderIds: [instanceId],
+			messages: messages
+		});
 	}
 }

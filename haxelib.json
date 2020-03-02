@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"tags": ["p2p", "peer to peer"],
 	"description": "library for p2p communication",
-	"version": "0.1.29",
-	"releasenote": "update init data share logic",
+	"version": "0.1.30",
+	"releasenote": "minor tweaks to max udp message size check",
 	"contributors": [ "p.j.shand" ],
 	"classPath": "src/",
 	"dependencies": {

@@ -3,9 +3,7 @@ package comms.connection;
 #if html5
 import js.Browser;
 import js.html.Window;
-
 import comms.CommsMessage.CommsBatch;
-
 import comms.*;
 import haxe.Json;
 import signals.Signal1;
@@ -46,14 +44,15 @@ class WindowPostConnection implements IConnection {
 		addWindow(Browser.window.opener);
 	}
 
-	public function send(batch:String):Void {
+	public function send(batch:String):Bool {
 		if (otherWindows.length == 0) {
 			trace("No other windows open");
-			return;
+			return false;
 		}
 		for (otherWindow in otherWindows) {
 			otherWindow.postMessage(batch, "*");
 		}
+		return true;
 	}
 
 	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {

@@ -106,13 +106,14 @@ class DatagramConnection implements IConnection {
 		callbacks.set(id, callback);
 	}
 
-	public function send(batch:String):Void {
+	public function send(batch:String):Bool {
 		// if (batch.indexOf('"{"value":"SendMessage: object Comms not found!') != -1) {
 		//	trace("here");
 		// }
 		buffer = Buffer.allocUnsafe(batch.length);
 		if (batch.length > 1472) {
 			trace("ERROR: batch to large");
+			return false;
 		}
 		// trace("length = " + batch.length);
 		// trace("batch = " + batch);
@@ -123,6 +124,7 @@ class DatagramConnection implements IConnection {
 				trace(err);
 			}
 		});
+		return true;
 	}
 
 	public function close():Void {

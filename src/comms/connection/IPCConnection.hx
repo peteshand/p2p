@@ -130,7 +130,7 @@ class IPCConnection implements IConnection {
 		}
 	}
 
-	public function send(batch:String):Void {
+	public function send(batch:String):Bool {
 		if (isRenderer) {
 			IpcRenderer.send("ipc", batch);
 			for (webview in webviews) {
@@ -143,6 +143,7 @@ class IPCConnection implements IConnection {
 				browserWindow.webContents.send("ipc", batch);
 			}
 		}
+		return true;
 	}
 
 	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {
