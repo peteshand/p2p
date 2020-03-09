@@ -19,6 +19,8 @@ class WindowPostConnection implements IConnection {
 	public static function addWindow(window:Window) {
 		if (window == null)
 			return;
+		if (window == js.Browser.window)
+			return;
 		for (otherWindow in otherWindows) {
 			if (otherWindow == window)
 				return;
@@ -45,18 +47,20 @@ class WindowPostConnection implements IConnection {
 	}
 
 	public function send(batch:String):Bool {
+		trace("SEND: " + batch);
 		if (otherWindows.length == 0) {
 			trace("No other windows open");
-			return false;
+			return true;
 		}
 		for (otherWindow in otherWindows) {
-			otherWindow.postMessage(batch, "*");
+			// otherWindow.postMessage(batch, "*");
 		}
 		return true;
 	}
 
 	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {
 		Browser.window.addEventListener('message', (event) -> {
+			trace("RECEIVE: " + event.data);
 			var batch:CommsBatch = Json.parse(event.data);
 			onBatch.dispatch(batch);
 			for (message in batch.messages) {

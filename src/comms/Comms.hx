@@ -216,8 +216,7 @@ class Comms {
 
 		for (connection in connections) {
 			if (!connection.send(batchStr)) {
-				Browser.console.log(messages);
-				trace("Error sending");
+				trace("Error sending: ");
 			}
 		}
 		messages = [];
@@ -225,9 +224,15 @@ class Comms {
 	}
 
 	function pack():String {
-		return Json.stringify({
-			senderIds: [instanceId],
-			messages: messages
-		});
+		var s:String = null;
+		try {
+			s = Json.stringify({
+				senderIds: [instanceId],
+				messages: messages
+			});
+		} catch (e:Dynamic) {
+			trace(e);
+		}
+		return s;
 	}
 }

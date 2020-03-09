@@ -80,6 +80,7 @@ class IPCConnection implements IConnection {
 	public function new() {
 		// connectionIndex = Comms.CONNECTION_COUNT++;
 		IPCConnection.init();
+		trace("isRenderer = " + isRenderer);
 		if (isRenderer) {
 			IpcRenderer.on("ipc", checkCallbacks);
 		} else {
@@ -89,6 +90,7 @@ class IPCConnection implements IConnection {
 	}
 
 	function checkCallbacks(event:Dynamic, batchStr:String) {
+		trace("RECEIVE: " + batchStr);
 		var batch:CommsBatch = null;
 		try {
 			batch = Json.parse(batchStr);
@@ -111,10 +113,12 @@ class IPCConnection implements IConnection {
 	}
 
 	function onBatchReceived(batch:CommsBatch) {
+		trace("RECEIVE: " + batch);
 		for (message in batch.messages) {
 			if (message.id == "")
 				continue;
 			var payload:CommsPayload = null;
+			trace("RECEIVE: " + payload);
 			try {
 				payload = Json.parse(message.payload);
 			} catch (e:Dynamic) {
@@ -131,6 +135,7 @@ class IPCConnection implements IConnection {
 	}
 
 	public function send(batch:String):Bool {
+		trace("SEND: " + batch);
 		if (isRenderer) {
 			IpcRenderer.send("ipc", batch);
 			for (webview in webviews) {

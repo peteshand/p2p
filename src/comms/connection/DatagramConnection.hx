@@ -20,6 +20,9 @@ class DatagramConnection implements IConnection {
 	public var connectionIndex:Int;
 	public var comms:Comms;
 
+	var sendCount:Int = 0;
+	var byteCount:Int = 0;
+
 	var port = 33333;
 	var multicastAddr = "233.255.255.255";
 	var callback:(bindsuccessful:Bool) -> Void;
@@ -38,6 +41,13 @@ class DatagramConnection implements IConnection {
 			this.multicastAddr = multicastAddr;
 
 		this.callback = callback;
+
+		Reflect.setProperty(js.Browser.window, 'datagramInfo', () -> {
+			return {
+				sendCount: sendCount,
+				byteCount: byteCount
+			}
+		});
 
 		socket = Dgram.createSocket({type: "udp4", reuseAddr: true});
 
@@ -124,6 +134,10 @@ class DatagramConnection implements IConnection {
 				trace(err);
 			}
 		});
+
+		sendCount++;
+		byteCount += batch.length;
+
 		return true;
 	}
 
