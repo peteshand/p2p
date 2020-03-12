@@ -7,6 +7,7 @@ import signals.Signal1;
 import js.node.Net;
 import js.node.net.Socket;
 import js.node.net.Server;
+import notifier.Notifier;
 
 @:access(comms.Comms)
 class TCPClientConnection implements IConnection {
@@ -27,6 +28,7 @@ class TCPClientConnection implements IConnection {
 
 	var createTime:Null<Float> = null;
 	var connected:Bool = false;
+	var disconnectedSeconds = new Notifier<Null<Int>>(null);
 
 	public function new(serverPort:Int = 1337, serverHost:String) {
 		this.serverPort = serverPort;
@@ -36,6 +38,13 @@ class TCPClientConnection implements IConnection {
 
 		onBatch.add(onBatchReceived);
 		EnterFrame.add(tick);
+
+		disconnectedSeconds.add((value:Null<Int>) -> {
+			if (value > 4) {
+				createClient();
+			}
+			trace("disconnectedSeconds = " + value);
+		});
 	}
 
 	function createClient() {
@@ -54,8 +63,8 @@ class TCPClientConnection implements IConnection {
 				// client.write('world!\r\n');
 			});
 		} catch (e:Dynamic) {
-			trace("failed to create client");
 			trace(e);
+			connected = false;
 			return;
 		}
 
@@ -133,10 +142,7 @@ class TCPClientConnection implements IConnection {
 	function tick() {
 		if (!connected) {
 			var dif:Float = Date.now().getTime() - createTime;
-			trace("not connected: " + dif);
-			if (dif > 4000) {
-				createClient();
-			}
+			disconnectedSeconds.value = Math.floor(dif / 1000);
 			return;
 		}
 

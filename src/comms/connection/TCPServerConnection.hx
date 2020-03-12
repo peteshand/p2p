@@ -15,6 +15,8 @@ class TCPServerConnection implements IConnection {
 	public var comms:Comms;
 
 	var serverPort:Int;
+	var serverHost:String;
+
 	var messages:Array<String> = [];
 	var server:Server = null;
 	var socket:Socket;
@@ -22,8 +24,9 @@ class TCPServerConnection implements IConnection {
 
 	var sending:Bool = false;
 
-	public function new(serverPort:Int = 1337) {
+	public function new(serverPort:Int = 1337, serverHost:String = 'localhost') {
 		this.serverPort = serverPort;
+		this.serverHost = serverHost;
 
 		createServer();
 
@@ -72,7 +75,7 @@ class TCPServerConnection implements IConnection {
 		});
 
 		trace("listen: " + serverPort);
-		server.listen(serverPort, function() { // 'listening' listener
+		server.listen(serverPort, serverHost, function() { // 'listening' listener
 			trace('server bound');
 
 			// if (callback != null) {
@@ -109,8 +112,7 @@ class TCPServerConnection implements IConnection {
 	}
 
 	function tick() {
-		trace(socket == null);
-		if (messages.length == 0 /*|| sending == true*/ || socket == null)
+		if (messages.length == 0 || socket == null)
 			return;
 		sending = true;
 		trace("sending");
