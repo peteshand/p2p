@@ -28,7 +28,8 @@ class DatagramConnection implements IConnection {
 	var callback:(bindsuccessful:Bool) -> Void;
 	var buffer:Buffer;
 	var socket:Socket;
-	var callbacks = new Map<String, (payload:Dynamic, connectionIndex:Int) -> Void>();
+	// var callbacks = new Map<String, (payload:Dynamic, connectionIndex:Int) -> Void>();
+	var callbacks = new Array<{key:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void}>();
 
 	public var onBatch = new Signal1<CommsBatch>();
 
@@ -88,9 +89,15 @@ class DatagramConnection implements IConnection {
 				continue;
 			}
 
-			for (key in callbacks.keys()) {
+			/*for (key in callbacks.keys()) {
 				if (key == messsage.id) {
 					var callback = callbacks.get(key);
+					callback(payload.value, connectionIndex);
+				}
+			}*/
+			for (item in callbacks) {
+				if (item.key == messsage.id) {
+					var callback = item.callback;
 					callback(payload.value, connectionIndex);
 				}
 			}
@@ -113,7 +120,11 @@ class DatagramConnection implements IConnection {
 	}
 
 	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {
-		callbacks.set(id, callback);
+		// callbacks.set(id, callback);
+		callbacks.push({
+			key: id,
+			callback: callback
+		});
 	}
 
 	public function send(batch:String):Bool {

@@ -18,7 +18,8 @@ class TCPServerConnection implements IConnection {
 	var messages:Array<String> = [];
 	var server:Server = null;
 	var socket:Socket;
-	var callbacks = new Map<String, (payload:Dynamic, connectionIndex:Int) -> Void>();
+	var callbacks = new Array<{key:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void}>();
+
 	var sending:Bool = false;
 
 	public function new(serverPort:Int = 1337) {
@@ -92,9 +93,9 @@ class TCPServerConnection implements IConnection {
 				continue;
 			}
 
-			for (key in callbacks.keys()) {
-				if (key == messsage.id) {
-					var callback = callbacks.get(key);
+			for (item in callbacks) {
+				if (item.key == messsage.id) {
+					var callback = item.callback;
 					callback(payload.value, connectionIndex);
 				}
 			}
@@ -122,7 +123,10 @@ class TCPServerConnection implements IConnection {
 	}
 
 	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {
-		callbacks.set(id, callback);
+		callbacks.push({
+			key: id,
+			callback: callback
+		});
 	}
 
 	public function close():Void {

@@ -16,6 +16,8 @@ class WindowPostConnection implements IConnection {
 
 	static var otherWindows:Array<Window> = [];
 
+	var callbacks = new Array<{key:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void}>();
+
 	public static function addWindow(window:Window) {
 		if (window == null)
 			return;
@@ -43,36 +45,67 @@ class WindowPostConnection implements IConnection {
 	public function new() {
 		// connectionIndex = Comms.CONNECTION_COUNT++;
 		addWindow(Browser.window.parent);
-		addWindow(Browser.window.opener);
+		if (Browser.window.parent != Browser.window.opener) {
+			addWindow(Browser.window.opener);
+		}
+
+		Browser.window.addEventListener('message', onMessage, false);
+		onBatch.add(onBatchReceived);
 	}
 
 	public function send(batch:String):Bool {
-		trace("SEND: " + batch);
+		// trace("SEND: " + batch);
 		if (otherWindows.length == 0) {
-			trace("No other windows open");
+			// trace("No other windows open");
 			return true;
 		}
 		for (otherWindow in otherWindows) {
-			// otherWindow.postMessage(batch, "*");
+			otherWindow.postMessage(batch, "*");
 		}
 		return true;
 	}
 
 	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {
-		Browser.window.addEventListener('message', (event) -> {
-			trace("RECEIVE: " + event.data);
-			var batch:CommsBatch = Json.parse(event.data);
-			onBatch.dispatch(batch);
-			for (message in batch.messages) {
-				var payload:CommsPayload = Json.parse(message.payload);
-				if (message.id == id || id == "*") {
-					// if (returnParsedPayload)
+		callbacks.push({
+			key: id,
+			callback: callback
+		});
+	}
+
+	function onMessage(event:{data:Dynamic}) {
+		// trace("RECEIVE: " + event.data);
+		var batch:CommsBatch = Json.parse(event.data);
+		onBatch.dispatch(batch);
+		/*for (message in batch.messages) {
+			var payload:CommsPayload = Json.parse(message.payload);
+			if (message.id == id || id == "*") {
+				// if (returnParsedPayload)
+				callback(payload.value, connectionIndex);
+				// else
+				// callback(message);
+			}
+		}*/
+	}
+
+	function onBatchReceived(batch:CommsBatch) {
+		for (messsage in batch.messages) {
+			if (messsage.id == '')
+				continue;
+			var payload:CommsPayload = null;
+			try {
+				payload = Json.parse(messsage.payload);
+			} catch (e:Dynamic) {
+				trace("Payload Parsing Error: " + e);
+				continue;
+			}
+
+			for (item in callbacks) {
+				if (item.key == messsage.id) {
+					var callback = item.callback;
 					callback(payload.value, connectionIndex);
-					// else
-					// callback(message);
 				}
 			}
-		}, false);
+		}
 	}
 
 	public function close():Void {

@@ -14,7 +14,7 @@ class TCPClientConnection implements IConnection {
 	public var connectionIndex:Int;
 	public var comms:Comms;
 
-	var callbacks = new Map<String, (payload:Dynamic, connectionIndex:Int) -> Void>();
+	var callbacks = new Array<{key:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void}>();
 
 	var serverPort:Int;
 	var serverHost:String = '127.0.0.1';
@@ -116,9 +116,9 @@ class TCPClientConnection implements IConnection {
 				continue;
 			}
 
-			for (key in callbacks.keys()) {
-				if (key == messsage.id) {
-					var callback = callbacks.get(key);
+			for (item in callbacks) {
+				if (item.key == messsage.id) {
+					var callback = item.callback;
 					callback(payload.value, connectionIndex);
 				}
 			}
@@ -134,7 +134,7 @@ class TCPClientConnection implements IConnection {
 		if (!connected) {
 			var dif:Float = Date.now().getTime() - createTime;
 			trace("not connected: " + dif);
-			if (dif > 10000) {
+			if (dif > 4000) {
 				createClient();
 			}
 			return;
@@ -146,13 +146,16 @@ class TCPClientConnection implements IConnection {
 		var batch = messages.shift();
 		client.write(batch, () -> {
 			// trace("client sent");
-			trace(batch);
+			// trace(batch);
 			sending = false;
 		});
 	}
 
 	public function on(id:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void):Void {
-		callbacks.set(id, callback);
+		callbacks.push({
+			key: id,
+			callback: callback
+		});
 	}
 
 	public function close():Void {
