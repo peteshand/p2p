@@ -13,6 +13,7 @@ class TCPServerConnection implements IConnection {
 	public var onBatch = new Signal1<CommsBatch>();
 	public var connectionIndex:Int;
 	public var comms:Comms;
+	public var active:Bool = true;
 
 	var serverPort:Int;
 	var serverHost:String;

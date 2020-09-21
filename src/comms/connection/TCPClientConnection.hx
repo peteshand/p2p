@@ -14,6 +14,7 @@ class TCPClientConnection implements IConnection {
 	public var onBatch = new Signal1<CommsBatch>();
 	public var connectionIndex:Int;
 	public var comms:Comms;
+	public var active:Bool = true;
 
 	var callbacks = new Array<{key:String, callback:(payload:Dynamic, connectionIndex:Int) -> Void}>();
 
@@ -29,6 +30,7 @@ class TCPClientConnection implements IConnection {
 	var createTime:Null<Float> = null;
 	var connected:Bool = false;
 	var disconnectedSeconds = new Notifier<Null<Int>>(null);
+	var instanceId(get, null):Null<Float>;
 
 	public function new(serverPort:Int = 1337, serverHost:String) {
 		this.serverPort = serverPort;
@@ -43,7 +45,6 @@ class TCPClientConnection implements IConnection {
 			if (value > 4) {
 				createClient();
 			}
-			trace("disconnectedSeconds = " + value);
 		});
 	}
 
@@ -103,7 +104,7 @@ class TCPClientConnection implements IConnection {
 				return;
 			}
 
-			if (batch.senderIds != null && batch.senderIds.indexOf(comms.instanceId) != -1) {
+			if (batch.senderIds != null && batch.senderIds.indexOf(instanceId) != -1) {
 				// from self
 				return;
 			}
@@ -111,6 +112,12 @@ class TCPClientConnection implements IConnection {
 			onBatch.dispatch(batch);
 		}
 		// trace(dataStr);
+	}
+
+	function get_instanceId() {
+		if (comms == null)
+			return null;
+		return comms.instanceId;
 	}
 
 	function onBatchReceived(batch:CommsBatch) {
@@ -140,7 +147,7 @@ class TCPClientConnection implements IConnection {
 	}
 
 	function tick() {
-		if (!connected) {
+		if (!connected && active) {
 			var dif:Float = Date.now().getTime() - createTime;
 			disconnectedSeconds.value = Math.floor(dif / 1000);
 			return;

@@ -19,6 +19,7 @@ import comms.CommsPayload;
 class DatagramConnection implements IConnection {
 	public var connectionIndex:Int;
 	public var comms:Comms;
+	public var active:Bool = true;
 
 	var sendCount:Int = 0;
 	var byteCount:Int = 0;

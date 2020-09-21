@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"tags": ["p2p", "peer to peer"],
 	"description": "library for p2p communication",
-	"version": "0.1.39",
+	"version": "0.1.44",
 	"releasenote": "add TCPClientConnection and TCPServerConnection",
 	"contributors": [ "p.j.shand" ],
 	"classPath": "src/",

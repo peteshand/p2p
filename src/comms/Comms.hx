@@ -14,6 +14,7 @@ import comms.notifier.*;
 import haxe.Json;
 import time.EnterFrame;
 import haxe.Serializer;
+import signals.Signal;
 
 class Comms {
 	static var staticInstance:Comms;
@@ -60,6 +61,7 @@ class Comms {
 
 	public var broadcasters = new Map<String, IBroadcaster>();
 	public var subscribers = new Map<String, ISubscriber>();
+	public var onPeerConnect = new Signal();
 
 	var connections:Array<IConnection> = [];
 	var listeningToConnect:Bool = false;
@@ -103,7 +105,7 @@ class Comms {
 
 		/*if (!listeningToConnect) {
 			listeningToConnect = true;
-			on('connect', onPeerConect);
+			on('connect', newPeerConnected);
 		}*/
 
 		relayer.addConnection(connection);
@@ -111,24 +113,27 @@ class Comms {
 
 		connection.on('connect', (payload, connectionIndex) -> {
 			trace("NEW CONNECTION -------------------------------------");
-			onPeerConect();
+			newPeerConnected();
 		});
 		Delay.killDelay(sendConnectMessage);
 		Delay.byFrames(30, sendConnectMessage);
 
-		Keyboard.onPress(Key.H, onPeerConect).ctrl(true).shift(true);
+		Keyboard.onPress(Key.H, newPeerConnected).ctrl(true).shift(true);
 	}
 
-	function onPeerConect() {
+	function newPeerConnected() {
+		trace("newPeerConnected");
+
 		for (broadcaster in broadcasters) {
 			broadcaster.setCurrentValue();
 		}
+		onPeerConnect.dispatch();
 	}
 
 	function sendConnectMessage() {
-		trace("sendConnectMessage");
+		// trace("sendConnectMessage");
 		send("connect", 0);
-		onPeerConect();
+		newPeerConnected();
 		EnterFrame.remove(tick);
 		EnterFrame.add(tick);
 	}

@@ -16,6 +16,7 @@ import signals.Signal1;
 class IPCConnection implements IConnection {
 	public var connectionIndex:Int;
 	public var comms:Comms;
+	public var active:Bool = true;
 
 	static var browserWindows:Array<BrowserWindow> = [];
 	static var webviews:Array<Webview> = [];

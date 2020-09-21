@@ -13,6 +13,7 @@ class WindowPostConnection implements IConnection {
 	public var connectionIndex:Int;
 	public var comms:Comms;
 	public var onBatch = new Signal1<CommsBatch>();
+	public var active:Bool = true;
 
 	static var otherWindows:Array<Window> = [];
 
@@ -60,7 +61,9 @@ class WindowPostConnection implements IConnection {
 			return true;
 		}
 		for (otherWindow in otherWindows) {
-			otherWindow.postMessage(batch, "*");
+			if (!otherWindow.closed) {
+				otherWindow.postMessage(batch, "*");
+			}
 		}
 		return true;
 	}
